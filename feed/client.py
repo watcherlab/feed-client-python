@@ -31,7 +31,7 @@ class Api(object):
         md5obj.update(stream)
         return md5obj.hexdigest()
 
-    def __open(self, url, params):
+    def __open(self, url, params=None):
         if not isinstance(url, str):
             raise TypeError(url)
 
@@ -55,12 +55,12 @@ class Api(object):
                 return response
             else:
                 return None
+
         except urllib.error.HTTPError as e:
-            print(e)
-            return None
+            raise urllib.error.HTTPError(e.url, e.code, e.msg, e.hdrs, e.fp)
 
         except urllib.error.URLError as e:
-            raise urllib.error.URLError(e)
+            raise urllib.error.URLError(e.reason)
 
     def query(self, data):
         if not isinstance(data, str):
@@ -71,7 +71,7 @@ class Api(object):
 
         url = "/".join([self.__url_query, data_utf8_b64])
 
-        response = self.__open(url=url, params=None)
+        response = self.__open(url=url)
         if response:
             return json.loads(response.read().decode("utf-8"), encoding="utf-8")
         else:
@@ -136,10 +136,13 @@ class Api(object):
 
         date_int = (datetime.datetime.now() - datetime.timedelta(days=date)).strftime("%Y%m%d")
         data_res = self.download_list(token, date)
+        data_count = 0
+        down_count = 0
 
         if data_res:
             if data_res["status"] == 1:
                 for data in data_res["data"]:
+                    data_count += 1
                     params = {
                         "token": token,
                         "type": data["dataName"],
@@ -147,6 +150,7 @@ class Api(object):
                         "date": date_int
                     }
                     response = self.__open(self.__url_download_advanced, params)
+
                     if response:
                         content = response.read()
                         md5 = self.__md5sum(content)
@@ -159,6 +163,10 @@ class Api(object):
 
                         with open(filepath, "wb") as fp:
                             fp.write(content)
+                        down_count += 1
+
+                return data_count, down_count
+
             else:
                 raise ValueError(data_res["message"])
         else:
