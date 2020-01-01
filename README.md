@@ -1,15 +1,17 @@
 # 守望者实验室威胁情报Feed系统
 **守望者实验室威胁情报Feed系统数据查询和下载官方python客户端**
 
+
 ## 说明
 * 本客户端旨在提供一种易于使用的威胁情报数据查询和下载方式
 
+## 下载统计
+[![Downloads](https://pepy.tech/badge/watcherlab-ti-client-python)](https://pepy.tech/project/watcherlab-ti-client-python)
 
 ## 客户端安装
 ```bash
 pip install watcherlab-ti-client-python
 ```
-
 
 ## 客户端示例
 ```python
